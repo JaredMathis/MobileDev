@@ -1,3 +1,5 @@
+https://github.com/settings/tokens/new?scopes=repo
+
 User enters github token
 Token is saved to localstorage
 

@@ -13,7 +13,9 @@ export function app_component_main(parent) {
 
     let login_message = ui_element_div(parent);
 
-    let repo_list = ui_element_div(parent);
+    let repos_container = ui_element_div(parent);
+
+    let repo_contents = ui_element_div(parent);
 
     button.addEventListener('click', async () => {
         let octokit = new Octokit({ auth: input.value });
@@ -24,13 +26,22 @@ export function app_component_main(parent) {
         ui_element_html_inner_set(login_message, `Logged in as ${login}`);
 
         let repos = await octokit.rest.repos.listForAuthenticatedUser();
-        ui_element_html_inner_clear(repo_list);
-        ui_element_select(repo_list, _.map(repos.data, 'name'))
+        let mapped = _.map(repos.data, 'full_name')
+        ui_element_html_inner_clear(repos_container);
+        let repos_select = ui_element_select(repos_container, [''].concat(mapped))
 
-        repos.addEventListener('change', async () => {
-
+        repos_select.addEventListener('change', async () => {
+            let repo_name = ui_element_select_selection(repos_select).value;
+            let repo = await octokit.rest.repos.get('/repos/' + repo_name + '/git/trees/main');
+            console.log({repo,repo_name})
         });
+
     });
+}
+
+function ui_element_select_selection(select) {
+    var selection = select.options[select.selectedIndex]
+    return selection
 }
 
 function ui_element_select(parent, options) {
