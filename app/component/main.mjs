@@ -6,7 +6,7 @@ export function app_component_main(parent) {
     let input = ui_element_input(parent, 'GitHub Personal access token');
     input.focus();
 
-    ui_element_button(parent, 'Login');
+    let button = ui_element_button(parent, 'Login');
 }
 
 function ui_element_button(parent, button_text) {
