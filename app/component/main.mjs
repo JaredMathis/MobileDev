@@ -11,6 +11,8 @@ export function app_component_main(parent) {
 
     let login_message = ui_element_div(parent);
 
+    let repo_list = ui_element_div(parent);
+
     button.addEventListener('click', async () => {
         let octokit = new Octokit({ auth: input.value });
         let {
