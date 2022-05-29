@@ -17,8 +17,6 @@ export function app_component_main(parent) {
 
     let repos_container2 = ui_element_div(parent);
 
-    let repo_contents = ui_element_div(parent);
-
     button.addEventListener('click', async () => {
         let octokit = new Octokit({ auth: input.value });
         let {
