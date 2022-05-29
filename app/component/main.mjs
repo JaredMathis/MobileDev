@@ -1,7 +1,9 @@
 import { ui_element } from "../../ui/element.mjs";
 import { ui_element_html_inner_set } from "../../ui/element/html/inner/set.mjs";
+import { ui_element_html_inner_clear } from "../../ui/element/html/inner/clear.mjs";
 import { ui_element_input } from "../../ui/element/input.mjs"
 import { Octokit, App } from "https://cdn.skypack.dev/octokit";
+import { _ } from "https://cdn.skypack.dev/lodash";
 
 export function app_component_main(parent) {
     let input = ui_element_input(parent, 'GitHub Personal access token');
@@ -22,8 +24,24 @@ export function app_component_main(parent) {
         ui_element_html_inner_set(login_message, `Logged in as ${login}`);
 
         let repos = await octokit.rest.repos.listForAuthenticatedUser();
-        console.log(repos)
+        ui_element_html_inner_clear(repo_list);
+        ui_element_select(repo_list, _.map(repos.data, 'name'))
     });
+}
+
+function ui_element_select(parent, options) {
+    let select = ui_element(parent, 'select');
+    _.forEach(options, o => {
+        ui_element_option(select, o, o);
+    })
+    return select;
+}
+
+function ui_element_option(parent, option_value, option_label) {
+    let option = ui_element(parent, 'option');
+    ui_element_html_inner_set(option, option_label);
+    option.setAttribute('value', option_value);
+    return option;
 }
 
 function ui_element_span(parent) {
