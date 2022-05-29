@@ -26,6 +26,10 @@ export function app_component_main(parent) {
         let repos = await octokit.rest.repos.listForAuthenticatedUser();
         ui_element_html_inner_clear(repo_list);
         ui_element_select(repo_list, _.map(repos.data, 'name'))
+
+        repos.addEventListener('change', async () => {
+
+        });
     });
 }
 
