@@ -15,8 +15,6 @@ export function app_component_main(parent) {
 
     let repos_container = ui_element_div(parent);
 
-    let repos_container2 = ui_element_div(parent);
-
     button.addEventListener('click', async () => {
         let octokit = new Octokit({ auth: input.value });
         let {
@@ -26,18 +24,36 @@ export function app_component_main(parent) {
         ui_element_html_inner_set(login_message, `Logged in as ${login}`);
 
         let repos = await octokit.rest.repos.listForAuthenticatedUser();
-        let mapped = _.map(repos.data, 'full_name')
+        let mapped = _.map(repos.data, t => {
+            return {
+                label: t.full_name,
+                value: t.trees_url.replace('{/sha}', '/main'),
+            }
+        })
         ui_element_html_inner_clear(repos_container);
         let repos_select = ui_element_select(repos_container, [''].concat(mapped))
 
-        repos_select.addEventListener('change', async () => {
-            let repo_name = ui_element_select_selection(repos_select).value;
-            let repo = await octokit.rest.repos.get('/repos/' + repo_name + '/git/trees/main');
-            console.log({repo})
-            ui_element_html_inner_clear(repos_container2);
-            let mapped2 = _.map(repo.data.tree, 'path')
-            let repos_select2 = ui_element_select(repos_container2, [''].concat(mapped2))
-        });
+        repos_select.addEventListener('change', on_change_repos_select(repos_container, repos_select));
+
+        function on_change_repos_select(parent_container, parent) {
+            return async function inner() {
+                console.log('here')
+                let repos_container2 = ui_element_div(parent_container);
+                let repo_url = ui_element_select_selection(parent).value;
+                let repo = await octokit.rest.repos.get(repo_url);
+                console.log({repo})
+                ui_element_html_inner_clear(repos_container2);
+                let mapped2 = _.map(repo.data.tree, t => {
+                    return {
+                        label: t.path,
+                        value: t.url,
+                    }
+                })
+                let repos_select2 = ui_element_select(repos_container2, [''].concat(mapped2))
+            
+                repos_select2.addEventListener('change', on_change_repos_select(repos_container2, repos_select2));
+            }
+        }
     });
 }
 
@@ -49,7 +65,7 @@ function ui_element_select_selection(select) {
 function ui_element_select(parent, options) {
     let select = ui_element(parent, 'select');
     _.forEach(options, o => {
-        ui_element_option(select, o, o);
+        ui_element_option(select, o.value || o, o.label || o);
     })
     return select;
 }
