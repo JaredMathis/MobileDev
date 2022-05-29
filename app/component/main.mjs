@@ -15,6 +15,8 @@ export function app_component_main(parent) {
 
     let repos_container = ui_element_div(parent);
 
+    let repos_container2 = ui_element_div(parent);
+
     let repo_contents = ui_element_div(parent);
 
     button.addEventListener('click', async () => {
@@ -33,9 +35,11 @@ export function app_component_main(parent) {
         repos_select.addEventListener('change', async () => {
             let repo_name = ui_element_select_selection(repos_select).value;
             let repo = await octokit.rest.repos.get('/repos/' + repo_name + '/git/trees/main');
-            console.log({repo,repo_name})
+            console.log({repo})
+            ui_element_html_inner_clear(repos_container2);
+            let mapped2 = _.map(repo.data.tree, 'path')
+            let repos_select2 = ui_element_select(repos_container2, [''].concat(mapped2))
         });
-
     });
 }
 
